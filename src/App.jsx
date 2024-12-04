@@ -1,29 +1,56 @@
 import { useState } from 'react';
 
 function App() {
-  const [titleField, setTitleField] = useState('');
+  const [titleFieldInsert, setTitleFieldInsert] = useState('');
+  const [titleFieldEdit, setTitleFieldEdit] = useState('');
   const [articleList, setArticleList] = useState([]);
+  const [postEditIndex, setPostEditIndex] = useState();
 
+  // # INSERT POST
   const handleInsertPostSubmit = (e) => {
     e.preventDefault();
 
     // console.log(titleField);
     // console.log(articleList);
 
-    if (!titleField) return;
+    if (!titleFieldInsert) return;
 
     const newArticle = {
-      title: titleField,
+      title: titleFieldInsert,
     };
 
     setArticleList([...articleList, newArticle]);
-    setTitleField('');
+    setTitleFieldInsert('');
   };
 
-  const handleTitleChange = (e) => {
-    setTitleField(e.target.value);
+  const handleInsertTitleChange = (e) => {
+    setTitleFieldInsert(e.target.value);
   };
 
+  // # EDIT POST
+  const handleEditPostSubmit = (e) => {
+    e.preventDefault();
+
+    console.log(titleFieldEdit);
+    console.log(postEditIndex);
+
+    if (!titleFieldEdit) return;
+    if (!postEditIndex) return;
+
+    const newArticleList = [...articleList];
+    newArticleList[postEditIndex].title = titleFieldEdit;
+    setArticleList(newArticleList);
+  };
+
+  const handleChangePostEdit = (e) => {
+    setPostEditIndex(e.target.value);
+  };
+
+  const handleEditTitleChange = (e) => {
+    setTitleFieldEdit(e.target.value);
+  };
+
+  // # DELETE POST
   const deletePost = (deleteIndex) => {
     const newArticleList = articleList.filter((article, articleIndex) => articleIndex !== deleteIndex);
     setArticleList(newArticleList);
@@ -35,15 +62,15 @@ function App() {
         {/* INSERT POST FORM SECTION */}
         <section className="py-4">
           <form onSubmit={handleInsertPostSubmit}>
-            <h2>Insert form</h2>
+            <h2>Inserisci nuovo post</h2>
             <div className="row">
               <div className="col-3">
                 <label className="form-label" htmlFor="post-title">
                   Titolo
                 </label>
                 <input
-                  value={titleField}
-                  onChange={handleTitleChange}
+                  value={titleFieldInsert}
+                  onChange={handleInsertTitleChange}
                   type="text"
                   className="form-control mb-3"
                   id="post-title"
@@ -52,6 +79,43 @@ function App() {
 
               <div className="col-12">
                 <button className="btn btn-success">Crea post</button>
+              </div>
+            </div>
+          </form>
+        </section>
+        <hr />
+        {/* EDIT POST FORM SECTION */}
+        <section className="py-4">
+          <form onSubmit={handleEditPostSubmit}>
+            <h2>Modifica post</h2>
+            <div className="row">
+              <div className="col-3">
+                <label className="form-label" htmlFor="post-selection">
+                  Seleziona post
+                </label>
+                <select onChange={handleChangePostEdit} className="form-select" id="post-selection">
+                  <option value="">Seleziona un post</option>
+                  {articleList.map((article, index) => (
+                    <option value={index}>{article.title}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="col-3">
+                <label className="form-label" htmlFor="post-title">
+                  Titolo
+                </label>
+                <input
+                  value={titleFieldEdit}
+                  onChange={handleEditTitleChange}
+                  type="text"
+                  className="form-control mb-3"
+                  id="post-title"
+                />
+              </div>
+
+              <div className="col-12">
+                <button className="btn btn-success">Modifica</button>
               </div>
             </div>
           </form>
