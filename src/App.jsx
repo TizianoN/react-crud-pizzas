@@ -1,27 +1,48 @@
 import { useState } from 'react';
 
+const possibleTags = ['HTML', 'CSS', 'JS'];
+
+const defaultPostFields = {
+  title: '',
+  author: '',
+  description: '',
+  published: false,
+  tags: [],
+};
+
 function App() {
-  const [titleField, setTitleField] = useState('');
+  const [formFields, setFormFields] = useState(defaultPostFields);
   const [articleList, setArticleList] = useState([]);
 
-  const handleInsertPostSubmit = (e) => {
+  const handlePostSubmit = (e) => {
     e.preventDefault();
 
-    // console.log(titleField);
-    // console.log(articleList);
+    if (!formFields.title) return;
+    if (!formFields.author) return;
 
-    if (!titleField) return;
-
-    const newArticle = {
-      title: titleField,
-    };
+    const newArticle = { ...formFields };
 
     setArticleList([...articleList, newArticle]);
-    setTitleField('');
+    setFormFields(defaultPostFields);
   };
 
-  const handleTitleChange = (e) => {
-    setTitleField(e.target.value);
+  const handleFormChange = (e) => {
+    const newFormFields = {
+      ...formFields,
+      [e.target.name]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
+    };
+
+    setFormFields(newFormFields);
+    console.log(newFormFields);
+  };
+
+  const handleFormTagsChange = (e) => {
+    let newTags = e.target.checked
+      ? [...formFields.tags, e.target.value]
+      : formFields.tags.filter((tag) => tag != e.target.value);
+
+    const newFormFields = { ...formFields, tags: newTags };
+    setFormFields(newFormFields);
   };
 
   const deletePost = (deleteIndex) => {
@@ -34,20 +55,84 @@ function App() {
       <div className="container">
         {/* INSERT POST FORM SECTION */}
         <section className="py-4">
-          <form onSubmit={handleInsertPostSubmit}>
+          <form onSubmit={handlePostSubmit}>
             <h2>Insert form</h2>
-            <div className="row">
+            <div className="row g-3">
               <div className="col-3">
                 <label className="form-label" htmlFor="post-title">
                   Titolo
                 </label>
                 <input
-                  value={titleField}
-                  onChange={handleTitleChange}
+                  value={formFields.title}
+                  onChange={handleFormChange}
                   type="text"
                   className="form-control mb-3"
                   id="post-title"
+                  name="title"
                 />
+              </div>
+
+              <div className="col-3">
+                <label className="form-label" htmlFor="post-author">
+                  Autore
+                </label>
+                <input
+                  value={formFields.author}
+                  onChange={handleFormChange}
+                  type="text"
+                  className="form-control mb-3"
+                  id="post-author"
+                  name="author"
+                />
+              </div>
+
+              <div className="col-3">
+                <label className="form-label" htmlFor="post-description">
+                  Description
+                </label>
+                <input
+                  value={formFields.description}
+                  onChange={handleFormChange}
+                  type="text"
+                  className="form-control mb-3"
+                  id="post-description"
+                  name="description"
+                />
+              </div>
+
+              <div className="col-3">
+                <label className="form-label" htmlFor="post-published">
+                  Pubblicato
+                </label>
+                <div>
+                  <input
+                    checked={formFields.published}
+                    onChange={handleFormChange}
+                    type="checkbox"
+                    id="post-published"
+                    name="published"
+                  />
+                </div>
+              </div>
+
+              <div className="col-3">
+                <label className="form-label">Tags</label>
+
+                {possibleTags.map((tag, index) => (
+                  <div key={index}>
+                    <label>
+                      <input
+                        checked={formFields.tags.includes(tag)}
+                        onChange={handleFormTagsChange}
+                        type="checkbox"
+                        name="post-tag"
+                        value={tag}
+                        className="me-2"
+                      />
+                      {tag}
+                    </label>
+                  </div>
+                ))}
               </div>
 
               <div className="col-12">
@@ -68,6 +153,16 @@ function App() {
                     <button onClick={() => deletePost(index)} type="button" className="btn-close"></button>
                     <div className="card-body">
                       <h3>{article.title}</h3>
+                      <p>{article.description}</p>
+                      {article.tags.map((tag) => (
+                        <span className="badge rounded-pill text-bg-primary me-2">{tag}</span>
+                      ))}
+
+                      {/* title: '',
+                      author: '',
+                      description: '',
+                      published: false,
+                      tags: [], */}
                     </div>
                   </div>
                 </div>
